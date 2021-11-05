@@ -6,6 +6,9 @@ import threading as thr
 import time as ti
 current_Promotions = 1000
 products = ["chips","riz","coca-cola","Tide","chargeur","PC","Chwin-Gum","bouteille d'eau","isabelle","kiri","la vache qui rit","joli","oreo","mirindina","sidi ali"] 
+number_of_articles=[]
+for i in range(len(products)):
+    number_of_articles.append(0)
 products_selected = []
 class SampleApp(tk.Tk):
 
@@ -235,23 +238,98 @@ class commanderPage(tk.Frame):
         heading_label.pack(pady=25)
 
         choose_amount_label = tk.Label(self,
-                                                           text='Choose the amount you want to commander',
+                                                           text='cliquez sur produit autant de fois que vous le voulez / cliquez sur enlevez le dernier article pour annuler le dernier article',
                                                            font=('orbitron',13),
                                                            fg='white',
                                                            bg='#3d3d5c')
         choose_amount_label.pack()
-
         #button_frame = tk.Frame(self,bg='#33334d')
         #button_frame.pack(fill='both',expand=True)
         master_frame = tk.Frame(self,bg='Light Blue', bd=9, relief=tk.RIDGE)
-        master_frame.pack(side = "right")
+        master_frame.pack(fill="x",side = "left")
+        side_frame = tk.Frame(self,bg='Light Blue', bd=9, relief=tk.RIDGE)
+        side_frame.pack(fill="x",side="right")
+        confirm_button = tk.Button(side_frame,
+                                                       text="confirmer",
+                                                       command=lambda:commander(5),
+                                                       relief='raised',
+                                                       borderwidth=3,
+                                                       width=20,
+                                                       bg='blue',fg='white',
+                                                       height=3)
+        confirm_button.pack()
+        drop_button = tk.Button(side_frame,
+                                                       text="enlevez le dernier",
+                                                       command=lambda:enlever(),
+                                                       relief='raised',
+                                                       borderwidth=3,
+                                                       width=20,
+                                                       bg='blue',fg='white',
+                                                       height=3)
+        drop_button.pack()
+        cancel_button = tk.Button(side_frame,
+                                                       text="vider le panier",
+                                                       command=lambda:clear(),
+                                                       relief='raised',
+                                                       borderwidth=3,
+                                                       width=20,
+                                                       bg='blue',fg='white',
+                                                       height=3)
+        cancel_button.pack()
+        """drop_button = tk.Button(side_frame,
+                                                       text="enlevez le dernier article",
+                                                       command=lambda:commander(5),
+                                                       relief='raised',
+                                                       borderwidth=3,
+                                                       width=20,
+                                                       bg='blue',fg='white',
+                                                       height=3)
+        drop_button.pack()"""
+        commande_list_text = tk.StringVar()
+        command_list = tk.Label(side_frame, textvariable=commande_list_text)
+        command_list.pack()
+        commande_list_text.set("your articles will be shown here")
         #cmd_frame = tk.Frame(self,bg='Light Blue', bd=3, relief=tk.RIDGE)
         #master_frame.columnconfigure(0, weight=1)
         def commander(amount):
+            global products_selected
             products_selected.append(amount)
-            products_selected.sort()
+            products_selected= list(set(products_selected))
+            tmp_text = ""
+            tmp_num = 0
+            #global tmp_search
+            tmp_search = []
+            number_of_articles[amount] = number_of_articles[amount]+1
+            for i in products_selected:
+                if (products[i] not in tmp_search):
+                    tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
+                    tmp_search.append(products[i])
+            commande_list_text.set(tmp_text)
+            #products_selected.sort()
             print(products_selected)
+            print(number_of_articles)
             print(amount)
+        def enlever():
+            print(products_selected)
+            print(products_selected[len(products_selected)-1])
+            number_of_articles[products_selected[len(products_selected)-1]] = 0
+            products_selected.remove(products_selected[len(products_selected)-1])
+            print(products_selected)
+            tmp_text = ""
+            tmp_search = []
+            for i in products_selected:
+                if (products[i] not in tmp_search):
+                    tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
+                    tmp_search.append(products[i])
+            commande_list_text.set(tmp_text)
+        
+        
+        def clear():
+            del products_selected[:]
+            del number_of_articles[:]
+            for i in range(len(products)):
+                number_of_articles.append(0)
+            commande_list_text.set("your articles will be shown here")
         # Create a frame for the canvas and scrollbar(s).
         #frame2 = tk.Frame(master_frame, bg='Red', bd=2, relief=tk.FLAT)
         #frame2.pack(fill='both',expand=True)
@@ -280,32 +358,32 @@ class commanderPage(tk.Frame):
         row_selected =0
         for i in range(0, int(ROWS)):
             if i%3 == 0:
-                three_hundred_button = tk.Button(button_frame,
+                buttons_first_row = tk.Button(button_frame,
                                                                        text=products[i],
                                                                        command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
                                                                        borderwidth=3,
                                                                        width=50,
                                                                        height=5)
-                three_hundred_button.grid(row=row_selected,column=0,pady=10)
+                buttons_first_row.grid(row=row_selected,column=0,pady=10)
             elif i%3 == 1:
-                three_hundred_button = tk.Button(button_frame,
+                buttons_second_row = tk.Button(button_frame,
                                                                        text=products[i],
                                                                        command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
                                                                        borderwidth=3,
                                                                        width=50,
                                                                        height=5)
-                three_hundred_button.grid(row=row_selected,column=1,pady=10)
+                buttons_second_row.grid(row=row_selected,column=1,pady=10)
             elif i%3 == 2:
-                three_hundred_button = tk.Button(button_frame,
+                buttons_third_row = tk.Button(button_frame,
                                                                        text=products[i],
                                                                        command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
                                                                        borderwidth=3,
                                                                        width=50,
                                                                        height=5)
-                three_hundred_button.grid(row=row_selected,column=2,pady=10)
+                buttons_third_row.grid(row=row_selected,column=2,pady=10)
                 row_selected=row_selected+1
 
         # Create canvas window to hold the buttons_frame.
@@ -330,7 +408,7 @@ class commanderPage(tk.Frame):
             
         other_amount_entry.bind('<Return>',other_amount)"""
 
-        bottom_frame = tk.Frame(self,relief='raised',borderwidth=3)
+        """bottom_frame = tk.Frame(self,relief='raised',borderwidth=3)
         bottom_frame.pack(fill='x',side='bottom')
 
         visa_photo = tk.PhotoImage(file='visa.png')
@@ -356,7 +434,7 @@ class commanderPage(tk.Frame):
         time_label = tk.Label(bottom_frame,font=('orbitron',12))
         time_label.pack(side='right')
 
-        tick()
+        tick()"""
    
 
 class compte_infosPage(tk.Frame):
