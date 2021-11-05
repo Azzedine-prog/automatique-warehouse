@@ -71,6 +71,7 @@ class StartPage(tk.Frame):
         #videoFrame.pack_propagate(0)
         my_label = tk.Label(self)
         my_label.pack()
+        #global thread
         thread = thr.Thread(target=stream, args=(my_label,))
         thread.daemon = 1
         thread.start()
@@ -113,7 +114,7 @@ class MenuPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent,bg='#3d3d5c')
         self.controller = controller
-   
+        
         heading_label = tk.Label(self,
                                                      text='depot automatique',
                                                      font=('orbitron',45,'bold'),
@@ -225,7 +226,7 @@ class commanderPage(tk.Frame):
         tk.Frame.__init__(self, parent,bg='#3d3d5c')
         self.controller = controller
 
-
+        
         heading_label = tk.Label(self,
                                                      text='depot automatique',
                                                      font=('orbitron',45,'bold'),
@@ -242,14 +243,15 @@ class commanderPage(tk.Frame):
 
         #button_frame = tk.Frame(self,bg='#33334d')
         #button_frame.pack(fill='both',expand=True)
-        master_frame = tk.Frame(self,bg='Light Blue', bd=3, relief=tk.RIDGE)
-        master_frame.pack(fill='both',expand=True)
+        master_frame = tk.Frame(self,bg='Light Blue', bd=9, relief=tk.RIDGE)
+        master_frame.pack(side = "right")
+        #cmd_frame = tk.Frame(self,bg='Light Blue', bd=3, relief=tk.RIDGE)
         #master_frame.columnconfigure(0, weight=1)
         def commander(amount):
-            global current_Promotions
-            current_Promotions -= amount
-            controller.shared_data['Promotions'].set(current_Promotions)
-            controller.show_frame('MenuPage')
+            products_selected.append(amount)
+            products_selected.sort()
+            print(products_selected)
+            print(amount)
         # Create a frame for the canvas and scrollbar(s).
         #frame2 = tk.Frame(master_frame, bg='Red', bd=2, relief=tk.FLAT)
         #frame2.pack(fill='both',expand=True)
@@ -275,41 +277,43 @@ class commanderPage(tk.Frame):
         ROWS=len(products)
         COLS=3
         # Add the buttons to the frame.
+        row_selected =0
         for i in range(0, int(ROWS)):
             if i%3 == 0:
                 three_hundred_button = tk.Button(button_frame,
                                                                        text=products[i],
-                                                                       command=lambda:commander(300),
+                                                                       command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
                                                                        borderwidth=3,
                                                                        width=50,
                                                                        height=5)
-                three_hundred_button.grid(row=0,column=0,pady=10)
+                three_hundred_button.grid(row=row_selected,column=0,pady=10)
             elif i%3 == 1:
                 three_hundred_button = tk.Button(button_frame,
                                                                        text=products[i],
-                                                                       command=lambda:commander(300),
+                                                                       command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
                                                                        borderwidth=3,
                                                                        width=50,
                                                                        height=5)
-                three_hundred_button.grid(row=int(i),column=1,pady=10)
+                three_hundred_button.grid(row=row_selected,column=1,pady=10)
             elif i%3 == 2:
                 three_hundred_button = tk.Button(button_frame,
                                                                        text=products[i],
-                                                                       command=lambda:commander(300),
+                                                                       command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
                                                                        borderwidth=3,
                                                                        width=50,
                                                                        height=5)
-                three_hundred_button.grid(row=int(i),column=2,pady=10)
+                three_hundred_button.grid(row=row_selected,column=2,pady=10)
+                row_selected=row_selected+1
 
         # Create canvas window to hold the buttons_frame.
         canvas.create_window((0,0), window=button_frame, anchor=tk.NW)
 
         button_frame.update_idletasks()  # Needed to make bbox info available.
         bbox = canvas.bbox(tk.ALL)  # Get bounding box of canvas with Buttons.
-        ROWS_DISP = 4  # Number of rows to display.
+        ROWS_DISP = row_selected+8  # Number of rows to display.
         COLS_DISP = 3  # Number of columns to display.
         # Define the scrollable region as entire canvas with only the desired
         # number of rows and columns displayed.
@@ -360,7 +364,7 @@ class compte_infosPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent,bg='#3d3d5c')
         self.controller = controller
-
+        
         heading_label = tk.Label(self,
                                                      text='depot automatique',
                                                      font=('orbitron',45,'bold'),
