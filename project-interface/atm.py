@@ -337,7 +337,7 @@ class commanderPage(tk.Frame):
         side_frame = tk.Frame(self,bg='Light Blue', bd=9, relief=tk.RIDGE)
         side_frame.pack(fill="x",side="right")
         def confirmer():
-            controller.show_frame('MenuPage')
+            controller.show_frame('ConfirmationPage')
         confirm_button = tk.Button(side_frame,
                                                        text="confirmer",
                                                        command=lambda:confirmer(),
@@ -554,15 +554,20 @@ class ConfirmationPage(tk.Frame):
 
         space_label = tk.Label(self,height=4,bg='#3d3d5c')
         space_label.pack()
-
+        tmp_text = ""
+        tmp_search=[]
+        for i in products_selected:
+            #if (products[i] not in tmp_search):
+            tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
+            tmp_search.append(products[i])
+            print("from confirmation page")
         enter_amount_label = tk.Label(self,
-                                                      text='Enter amount',
-                                                      font=('orbitron',13),
-                                                      bg='#3d3d5c',
-                                                      fg='white')
+                                              text=tmp_text,
+                                              font=('orbitron',13),
+                                              bg='#3d3d5c',
+                                              fg='white')
         enter_amount_label.pack(pady=10)
-
-        cash = tk.StringVar()
+        """cash = tk.StringVar()
         compte_infos_entry = tk.Entry(self,
                                                   textvariable=cash,
                                                   font=('orbitron',12),
@@ -583,7 +588,7 @@ class ConfirmationPage(tk.Frame):
                                                      borderwidth=3,
                                                      width=40,
                                                      height=3)
-        enter_button.pack(pady=10)
+        enter_button.pack(pady=10)"""
 
         two_tone_label = tk.Label(self,bg='#33334d')
         two_tone_label.pack(fill='both',expand=True)
