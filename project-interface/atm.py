@@ -20,7 +20,7 @@ class SampleApp(tk.Tk):
         self.shared_data = {'Promotions':tk.IntVar()}
 
         container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
+        container.pack()#side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
 
@@ -134,9 +134,9 @@ class StartPage(tk.Frame):
         tk.Frame.__init__(self, parent,bg='#3d3d5c')
         self.controller = controller
         self.controller.title('depot automatique')
-        self.controller.state('zoomed')
+        self.controller.state('normal')
         heading_label = tk.Label(self,text='depot automatique',font=('orbitron',45,'bold','italic'),foreground='#ffffff',background='#3d3d5c')
-        heading_label.pack(pady=25)
+        heading_label.pack(pady=5)
         space_label = tk.Label(self,height=4,bg='#3d3d5c')
         space_label.pack()
         video_name = "Creditcard.mp4" #This is your video file path
@@ -149,10 +149,10 @@ class StartPage(tk.Frame):
             while True:
                 for image in video.iter_data():
                     #Load an image in the script
-                    #img= Image.fromarray(image)
+                    img= Image.fromarray(image)
                     #Resize the Image using resize method
-                    #resized_image= img.resize((640,360), Image.ANTIALIAS)
-                    frame_image = ImageTk.PhotoImage(Image.fromarray(image))
+                    resized_image= img.resize((150,100), Image.ANTIALIAS)
+                    frame_image = ImageTk.PhotoImage(resized_image)
                     label.config(image=frame_image)
                     label.image = frame_image
                     ti.sleep(0.006)
@@ -210,7 +210,7 @@ class MenuPage(tk.Frame):
                                                      font=('orbitron',45,'bold'),
                                                      foreground='#ffffff',
                                                      background='#3d3d5c')
-        heading_label.pack(pady=25)
+        heading_label.pack(pady=5)
 
         main_menu_label = tk.Label(self,
                                                            text='Main Menu',
@@ -237,9 +237,7 @@ class MenuPage(tk.Frame):
                                                             text='commander',
                                                             command=commander,
                                                             relief='raised',
-                                                            borderwidth=3,
-                                                            width=50,
-                                                            height=5)
+                                                            borderwidth=3)
         commander_button.grid(row=0,column=0,pady=5)
 
         def compte_infos():
@@ -249,9 +247,7 @@ class MenuPage(tk.Frame):
                                                             text='compte_infos',
                                                             command=compte_infos,
                                                             relief='raised',
-                                                            borderwidth=3,
-                                                            width=50,
-                                                            height=5)
+                                                            borderwidth=3)
         compte_infos_button.grid(row=1,column=0,pady=5)
 
         def Promotions():
@@ -261,9 +257,7 @@ class MenuPage(tk.Frame):
                                                             text='Promotions',
                                                             command=Promotions,
                                                             relief='raised',
-                                                            borderwidth=3,
-                                                            width=50,
-                                                            height=5)
+                                                            borderwidth=3)
         Promotions_button.grid(row=2,column=0,pady=5)
 
         def exit():
@@ -275,9 +269,7 @@ class MenuPage(tk.Frame):
                                                             text='Exit',
                                                             command=exit,
                                                             relief='raised',
-                                                            borderwidth=3,
-                                                            width=50,
-                                                            height=5)
+                                                            borderwidth=3)
         exit_button.grid(row=3,column=0,pady=5)
 
 
@@ -322,7 +314,7 @@ class commanderPage(tk.Frame):
                                                      font=('orbitron',45,'bold'),
                                                      foreground='#ffffff',
                                                      background='#3d3d5c')
-        heading_label.pack(pady=25)
+        heading_label.pack(pady=5)
 
         choose_amount_label = tk.Label(self,
                                                            text='cliquez sur produit autant de fois que vous le voulez / cliquez sur enlevez le dernier article pour annuler le dernier article',
@@ -454,6 +446,8 @@ class commanderPage(tk.Frame):
 
         # Create a frame on the canvas to contain the grid of buttons.
         button_frame = tk.Frame(canvas)
+        #yscrollbar = tk.Scrollbar(canvas)
+        #yscrollbar.pack( side = "right", fill = "y" )
         ROWS=len(products)
         COLS=3
         # Add the buttons to the frame.
@@ -464,42 +458,36 @@ class commanderPage(tk.Frame):
                                                                        text=products[i],
                                                                        command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
-                                                                       borderwidth=3,
-                                                                       width=50,
-                                                                       height=5)
+                                                                       borderwidth=3)
                 buttons_first_row.grid(row=row_selected,column=0,pady=10)
             elif i%3 == 1:
                 buttons_second_row = tk.Button(button_frame,
                                                                        text=products[i],
                                                                        command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
-                                                                       borderwidth=3,
-                                                                       width=50,
-                                                                       height=5)
+                                                                       borderwidth=3)
                 buttons_second_row.grid(row=row_selected,column=1,pady=10)
             elif i%3 == 2:
                 buttons_third_row = tk.Button(button_frame,
                                                                        text=products[i],
                                                                        command=lambda i=i:commander(int(i)),
                                                                        relief='raised',
-                                                                       borderwidth=3,
-                                                                       width=50,
-                                                                       height=5)
+                                                                       borderwidth=3)
                 buttons_third_row.grid(row=row_selected,column=2,pady=10)
                 row_selected=row_selected+1
 
         # Create canvas window to hold the buttons_frame.
         canvas.create_window((0,0), window=button_frame, anchor=tk.NW)
-
+        #yscrollbar.config( command = canvas.yview)
         button_frame.update_idletasks()  # Needed to make bbox info available.
         bbox = canvas.bbox(tk.ALL)  # Get bounding box of canvas with Buttons.
-        ROWS_DISP = row_selected+8  # Number of rows to display.
+        ROWS_DISP = 9  # Number of rows to display.
         COLS_DISP = 3  # Number of columns to display.
         # Define the scrollable region as entire canvas with only the desired
         # number of rows and columns displayed.
         w, h = bbox[2]-bbox[1], bbox[3]-bbox[1]
         dw, dh = int((w/COLS) * COLS_DISP), int((h/ROWS) * ROWS_DISP)
-        canvas.configure(scrollregion=bbox, width=dw, height=dh)
+        canvas.configure(scrollregion=bbox, width=dw, height=dh,yscrollcommand=vsbar.set)
 
         """def other_amount(_):
             global current_Promotions
@@ -550,7 +538,7 @@ class ConfirmationPage(tk.Frame):
                                                      font=('orbitron',45,'bold'),
                                                      foreground='#ffffff',
                                                      background='#3d3d5c')
-        heading_label.pack(pady=25)
+        heading_label.pack(pady=5)
 
         space_label = tk.Label(self,height=4,bg='#3d3d5c')
         space_label.pack()
@@ -639,7 +627,7 @@ class compte_infosPage(tk.Frame):
                                                      font=('orbitron',45,'bold'),
                                                      foreground='#ffffff',
                                                      background='#3d3d5c')
-        heading_label.pack(pady=25)
+        heading_label.pack(pady=5)
 
         space_label = tk.Label(self,height=4,bg='#3d3d5c')
         space_label.pack()
@@ -669,9 +657,7 @@ class compte_infosPage(tk.Frame):
                                                      text='Enter',
                                                      command=compte_infos_cash,
                                                      relief='raised',
-                                                     borderwidth=3,
-                                                     width=40,
-                                                     height=3)
+                                                     borderwidth=3)
         enter_button.pack(pady=10)
 
         two_tone_label = tk.Label(self,bg='#33334d')
@@ -718,7 +704,7 @@ class PromotionsPage(tk.Frame):
                                                      font=('orbitron',45,'bold'),
                                                      foreground='#ffffff',
                                                      background='#3d3d5c')
-        heading_label.pack(pady=25)
+        heading_label.pack(pady=5)
 
         global current_Promotions
         controller.shared_data['Promotions'].set(current_Promotions)
@@ -740,9 +726,7 @@ class PromotionsPage(tk.Frame):
                                                     command=menu,
                                                     text='Menu',
                                                     relief='raised',
-                                                    borderwidth=3,
-                                                    width=50,
-                                                    height=5)
+                                                    borderwidth=3)
         menu_button.grid(row=0,column=0,pady=5)
 
         def exit():
@@ -752,9 +736,7 @@ class PromotionsPage(tk.Frame):
                                                  text='Exit',
                                                  command=exit,
                                                  relief='raised',
-                                                 borderwidth=3,
-                                                 width=50,
-                                                 height=5)
+                                                 borderwidth=3)
         exit_button.grid(row=1,column=0,pady=5)
 
         bottom_frame = tk.Frame(self,relief='raised',borderwidth=3)
@@ -788,4 +770,6 @@ class PromotionsPage(tk.Frame):
 
 if __name__ == "__main__":
     app = SampleApp()
+    #root = tk.Tk()               #Bind Tkinter to the root object
+    app.geometry('800x480')
     app.mainloop()
