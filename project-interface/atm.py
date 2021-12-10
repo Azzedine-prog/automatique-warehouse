@@ -567,12 +567,20 @@ class ConfirmationPage(tk.Frame):
                                               bg='#3d3d5c',
                                               fg='white')
         enter_amount_label.pack(pady=10)
-        """cash = tk.StringVar()
-        compte_infos_entry = tk.Entry(self,
-                                                  textvariable=cash,
-                                                  font=('orbitron',12),
-                                                  width=22)
-        compte_infos_entry.pack(ipady=7)
+        cash = tk.StringVar()
+        commande_list_text = tk.StringVar()
+        command_list = tk.Label(self, textvariable=commande_list_text)
+        command_list.pack()
+        commande_list_text.set("your articles will be shown here")
+        tmp_text = ""
+        tmp_search = []
+        print("product selected : ",products_selected)
+        for i in products_selected:
+            if (products[i] not in tmp_search):
+                tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
+                tmp_search.append(products[i])
+        print(tmp_text)
+        commande_list_text.set(tmp_text)
 
         def compte_infos_cash():
             global current_Promotions
@@ -588,7 +596,7 @@ class ConfirmationPage(tk.Frame):
                                                      borderwidth=3,
                                                      width=40,
                                                      height=3)
-        enter_button.pack(pady=10)"""
+        enter_button.pack(pady=10)
 
         two_tone_label = tk.Label(self,bg='#33334d')
         two_tone_label.pack(fill='both',expand=True)
