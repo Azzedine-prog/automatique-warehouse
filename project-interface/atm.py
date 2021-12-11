@@ -1,10 +1,13 @@
 import tkinter as tk
 import time
+from rfid_mod import *
 import imageio
 from PIL import Image, ImageTk
 import threading as thr
 import time as ti
-from tkinter import messagebox  
+from tkinter import messagebox
+azzedine = user(702455483582,"azzedine lakhdar",350)
+houssam = user(659916243695,"houssam elhazami",9000000)
 current_Promotions = 1000
 products = ["chips","riz","coca-cola","Tide","chargeur","PC","Chwin-Gum","bouteille d'eau","isabelle","kiri","la vache qui rit","joli","oreo","mirindina","sidi ali"] 
 number_of_articles=[]
