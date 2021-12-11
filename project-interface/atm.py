@@ -9,6 +9,8 @@ current_Promotions = 1000
 products = ["chips","riz","coca-cola","Tide","chargeur","PC","Chwin-Gum","bouteille d'eau","isabelle","kiri","la vache qui rit","joli","oreo","mirindina","sidi ali"] 
 number_of_articles=[]
 number_of =0
+tmp_text = ""
+tmp_search=[]
 for i in range(len(products)):
     number_of_articles.append(0)
 products_selected = []   
@@ -76,9 +78,9 @@ class SampleApp(tk.Tk):
                 tmp_search.append(products[i])
         facture.set(tmp_text)
         #products_selected.sort()
-        print(products_selected)
-        print(number_of_articles)
-        print(amount)
+        print("product selected from sampleApp ",products_selected,"\n")
+        print("number of every article from SampleApp : ",number_of_articles,"\n")
+        print("amount from SampleApp",amount,"\n")
     def enlever_article(self,product,wind,facture):
         number_of_articles[product] = 0
         try:
@@ -401,12 +403,14 @@ class commanderPage(tk.Frame):
             print(number_of_articles)
             print(amount)"""
         def enlever():
-            print(products_selected)
-            print(products_selected[len(products_selected)-1])
+            #print(products_selected)
+            #print("product selected from commander page before remove : ",products_selected[len(products_selected)-1])
             number_of_articles[products_selected[len(products_selected)-1]] = 0
             products_selected.remove(products_selected[len(products_selected)-1])
-            print(products_selected)
+            print("product selected from commander page after remove : ",products_selected,"\n")
+            global tmp_text
             tmp_text = ""
+            global tmp_search
             tmp_search = []
             for i in products_selected:
                 if (products[i] not in tmp_search):
@@ -542,33 +546,21 @@ class ConfirmationPage(tk.Frame):
 
         space_label = tk.Label(self,height=4,bg='#3d3d5c')
         space_label.pack()
-        tmp_text = ""
-        tmp_search=[]
-        for i in products_selected:
-            #if (products[i] not in tmp_search):
-            tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
-            tmp_search.append(products[i])
-            print("from confirmation page")
-        enter_amount_label = tk.Label(self,
-                                              text=tmp_text,
-                                              font=('orbitron',13),
-                                              bg='#3d3d5c',
-                                              fg='white')
-        enter_amount_label.pack(pady=10)
-        cash = tk.StringVar()
-        commande_list_text = tk.StringVar()
-        command_list = tk.Label(self, textvariable=commande_list_text)
-        command_list.pack()
-        commande_list_text.set("your articles will be shown here")
-        tmp_text = ""
-        tmp_search = []
-        print("product selected : ",products_selected)
+        #global tmp_text
         for i in products_selected:
             if (products[i] not in tmp_search):
                 tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
                 tmp_search.append(products[i])
-        print(tmp_text)
-        commande_list_text.set(tmp_text)
+            print("from confirmation page")
+        cash = tk.StringVar()
+        commande_list_text1 = tk.StringVar()
+        command_list1 = tk.Label(self, textvariable=commande_list_text1)
+        command_list1.pack()
+        commande_list_text1.set(tmp_text)
+        #global tmp_text
+        #global tmp_search
+        print("product selected : ",products_selected)
+        #commande_list_text.set(tmp_text)
 
         def compte_infos_cash():
             global current_Promotions
@@ -576,10 +568,17 @@ class ConfirmationPage(tk.Frame):
             controller.shared_data['Promotions'].set(current_Promotions)
             controller.show_frame('MenuPage')
             cash.set('')
+        #global tmp_search
+        def show_facture():
+            for i in products_selected:
+                if (products[i] not in tmp_search):
+                    tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
+                    tmp_search.append(products[i])
+            print( "745896",tmp_text,"\n")
             
         enter_button = tk.Button(self,
-                                                     text='Enter',
-                                                     command=compte_infos_cash,
+                                                     text='afficher ma facture',
+                                                     command=show_facture,
                                                      relief='raised',
                                                      borderwidth=3,
                                                      width=40,
