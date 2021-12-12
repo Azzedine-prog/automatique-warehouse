@@ -6,8 +6,11 @@ from PIL import Image, ImageTk
 import threading as thr
 import time as ti
 from tkinter import messagebox
-azzedine = user(702455483582,"azzedine lakhdar",350)
-houssam = user(659916243695,"houssam elhazami",9000000)
+rfid_hardware_exist = 1
+if(rfid_hardware_exist==1):
+    from rfid_mod import *
+    azzedine = user(702455483582,"azzedine lakhdar",350)
+    houssam = user(659916243695,"houssam elhazami",9000000)
 current_Promotions = 1000
 products = ["chips","riz","coca-cola","Tide","chargeur","PC","Chwin-Gum","bouteille d'eau","isabelle","kiri","la vache qui rit","joli","oreo","mirindina","sidi ali"] 
 number_of_articles=[]
@@ -171,10 +174,19 @@ class StartPage(tk.Frame):
         thread.daemon = 1
         thread.start()
         def check_Rfid():
-            controller.show_frame('MenuPage')      
+            while(True):
+                if(rfid_hardware_exist==1):
+                    ID, text_1 = reader.read()
+                    if(check_valide(ID) != None):
+                        controller.show_frame('MenuPage')
+                else:
+                    print("no rfid hardware")
                
-        enter_button = tk.Button(self,text='Enter',command=check_Rfid,relief='raised',borderwidth = 3,width=40,height=3)
-        enter_button.pack(pady=10)
+        rfid_application = thr.Thread(target=check_Rfid)
+        rfid_application.daemon = 1
+        rfid_application.start()
+        #enter_button = tk.Button(self,text='Enter',command=check_Rfid,relief='raised',borderwidth = 3,width=40,height=3)
+        #enter_button.pack(pady=10)
 
         bottom_frame = tk.Frame(self,relief='raised',borderwidth=3)
         bottom_frame.pack(fill='x',side='bottom')
