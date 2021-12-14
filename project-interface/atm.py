@@ -1,17 +1,25 @@
 import tkinter as tk
 import time
-from rfid_mod import *
 import imageio
 from PIL import Image, ImageTk
 import threading as thr
 import time as ti
 from tkinter import messagebox
-azzedine = user(702455483582,"azzedine lakhdar",350)
-houssam = user(659916243695,"houssam elhazami",9000000)
+environment_raspberry = 0
+if(environment_raspberry == 1):
+    from rfid_mod import *
+rfid_hardware_exist = 0
+if(rfid_hardware_exist==1):
+    from rfid_mod import *
+    azzedine = user(702455483582,"azzedine lakhdar",350)
+    houssam = user(659916243695,"houssam elhazami",9000000)
 current_Promotions = 1000
 products = ["chips","riz","coca-cola","Tide","chargeur","PC","Chwin-Gum","bouteille d'eau","isabelle","kiri","la vache qui rit","joli","oreo","mirindina","sidi ali"] 
 number_of_articles=[]
+prices = [3,10,8,3,45,12000,1,6,8,2,1,9,2,1,6]
 number_of =0
+tmp_text = ""
+tmp_search=[]
 for i in range(len(products)):
     number_of_articles.append(0)
 products_selected = []   
@@ -28,7 +36,7 @@ class SampleApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (StartPage, MenuPage, commanderPage, compte_infosPage, PromotionsPage,ConfirmationPage):
+        for F in (StartPage, MenuPage, commanderPage, compte_infosPage, PromotionsPage,ConfirmationPage,wait_page):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -79,9 +87,9 @@ class SampleApp(tk.Tk):
                 tmp_search.append(products[i])
         facture.set(tmp_text)
         #products_selected.sort()
-        print(products_selected)
-        print(number_of_articles)
-        print(amount)
+        print("product selected from sampleApp ",products_selected,"\n")
+        print("number of every article from SampleApp : ",number_of_articles,"\n")
+        print("amount from SampleApp",amount,"\n")
     def enlever_article(self,product,wind,facture):
         number_of_articles[product] = 0
         try:
@@ -169,10 +177,28 @@ class StartPage(tk.Frame):
         thread.daemon = 1
         thread.start()
         def check_Rfid():
-            controller.show_frame('MenuPage')      
-               
-        enter_button = tk.Button(self,text='Enter',command=check_Rfid,relief='raised',borderwidth = 3,width=40,height=3)
-        enter_button.pack(pady=10)
+            while(True):
+                if(rfid_hardware_exist==1):
+                    ID, text_1 = reader.read()
+                    if(check_valide(ID) != None):
+                        controller.show_frame('MenuPage')
+                else:
+                    print("no rfid hardware")
+        def manual_check_rfid():
+            controller.show_frame('MenuPage')
+        if(rfid_hardware_exist==0):
+            exit_button = tk.Button(self,
+                                                    text='enter',
+                                                    command=manual_check_rfid,
+                                                    relief='raised',
+                                                    borderwidth=3)
+            exit_button.pack()
+        if(rfid_hardware_exist==1):
+            rfid_application = thr.Thread(target=check_Rfid)
+            rfid_application.daemon = 1
+            rfid_application.start()
+        #enter_button = tk.Button(self,text='Enter',command=check_Rfid,relief='raised',borderwidth = 3,width=40,height=3)
+        #enter_button.pack(pady=10)
 
         bottom_frame = tk.Frame(self,relief='raised',borderwidth=3)
         bottom_frame.pack(fill='x',side='bottom')
@@ -339,8 +365,7 @@ class commanderPage(tk.Frame):
                                                        relief='raised',
                                                        borderwidth=3,
                                                        width=20,
-                                                       bg='blue',fg='white',
-                                                       height=3)
+                                                       bg='blue',fg='white')
         confirm_button.pack()
         drop_button = tk.Button(side_frame,
                                                        text="enlevez le dernier",
@@ -348,8 +373,7 @@ class commanderPage(tk.Frame):
                                                        relief='raised',
                                                        borderwidth=3,
                                                        width=20,
-                                                       bg='blue',fg='white',
-                                                       height=3)
+                                                       bg='blue',fg='white')
         drop_button.pack()
         cancel_button = tk.Button(side_frame,
                                                        text="vider le panier",
@@ -357,8 +381,7 @@ class commanderPage(tk.Frame):
                                                        relief='raised',
                                                        borderwidth=3,
                                                        width=20,
-                                                       bg='blue',fg='white',
-                                                       height=3)
+                                                       bg='blue',fg='white')
         cancel_button.pack()
         exit_button= tk.Button(side_frame,
                                                        text="exit",
@@ -366,8 +389,7 @@ class commanderPage(tk.Frame):
                                                        relief='raised',
                                                        borderwidth=3,
                                                        width=20,
-                                                       bg='blue',fg='white',
-                                                       height=3)
+                                                       bg='blue',fg='white')
         exit_button.pack()
         """drop_button = tk.Button(side_frame,
                                                        text="enlevez le dernier article",
@@ -404,12 +426,14 @@ class commanderPage(tk.Frame):
             print(number_of_articles)
             print(amount)"""
         def enlever():
-            print(products_selected)
-            print(products_selected[len(products_selected)-1])
+            #print(products_selected)
+            #print("product selected from commander page before remove : ",products_selected[len(products_selected)-1])
             number_of_articles[products_selected[len(products_selected)-1]] = 0
             products_selected.remove(products_selected[len(products_selected)-1])
-            print(products_selected)
+            print("product selected from commander page after remove : ",products_selected,"\n")
+            global tmp_text
             tmp_text = ""
+            global tmp_search
             tmp_search = []
             for i in products_selected:
                 if (products[i] not in tmp_search):
@@ -545,25 +569,21 @@ class ConfirmationPage(tk.Frame):
 
         space_label = tk.Label(self,height=4,bg='#3d3d5c')
         space_label.pack()
-        tmp_text = ""
-        tmp_search=[]
+        global tmp_text
         for i in products_selected:
-            #if (products[i] not in tmp_search):
-            tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
-            tmp_search.append(products[i])
+            if (products[i] not in tmp_search):
+                tmp_text = tmp_text + str(number_of_articles[i]) + "->"+products[i]+"\n"
+                tmp_search.append(products[i])
             print("from confirmation page")
-        enter_amount_label = tk.Label(self,
-                                              text=tmp_text,
-                                              font=('orbitron',13),
-                                              bg='#3d3d5c',
-                                              fg='white')
-        enter_amount_label.pack(pady=10)
-        """cash = tk.StringVar()
-        compte_infos_entry = tk.Entry(self,
-                                                  textvariable=cash,
-                                                  font=('orbitron',12),
-                                                  width=22)
-        compte_infos_entry.pack(ipady=7)
+        cash = tk.StringVar()
+        commande_list_text1 = tk.StringVar()
+        command_list1 = tk.Label(self, textvariable=commande_list_text1)
+        command_list1.pack()
+        commande_list_text1.set(tmp_text)
+        #global tmp_text
+        #global tmp_search
+        print("product selected : ",products_selected)
+        #commande_list_text.set(tmp_text)
 
         def compte_infos_cash():
             global current_Promotions
@@ -571,16 +591,42 @@ class ConfirmationPage(tk.Frame):
             controller.shared_data['Promotions'].set(current_Promotions)
             controller.show_frame('MenuPage')
             cash.set('')
-            
+        #global tmp_search
+        tmp_search = []
+        def show_facture():
+            global tmp_text
+            total = 0
+            for i in products_selected:
+                if (products[i] not in tmp_search):
+                    price = int(number_of_articles[i])*int(prices[i])
+                    total = total + price
+                    tmp_text = tmp_text + products[i]+" : "+str(number_of_articles[i]) + " pieces  = "+str(number_of_articles[i])+" x "+str(prices[i])+" = "+str(price)+" Dh\n"
+                    tmp_search.append(products[i])
+            tmp_text = tmp_text + "\t\t total : "+str(total)+" Dh"
+            commande_list_text1.set(tmp_text)
+            print( tmp_text,"\n")
+        def confirm_command():
+            # bluetooth send here .......................
+            #...........................................
+            #...........................................
+            #...........................................
+            controller.show_frame('wait_page')
         enter_button = tk.Button(self,
-                                                     text='Enter',
-                                                     command=compte_infos_cash,
+                                                     text='afficher ma facture',
+                                                     command=show_facture,
                                                      relief='raised',
                                                      borderwidth=3,
                                                      width=40,
                                                      height=3)
-        enter_button.pack(pady=10)"""
-
+        enter_button.pack(pady=10)
+        enter_button = tk.Button(self,
+                                             text='confirmer',
+                                             command=confirm_command,
+                                             relief='raised',
+                                             borderwidth=3,
+                                             width=40,
+                                             height=3)
+        enter_button.pack(pady=10)
         two_tone_label = tk.Label(self,bg='#33334d')
         two_tone_label.pack(fill='both',expand=True)
 
@@ -762,7 +808,46 @@ class PromotionsPage(tk.Frame):
 
         tick()
 
+class wait_page(tk.Frame):
 
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent,bg='#3d3d5c')
+        self.controller = controller
+        self.controller.title('depot automatique')
+        self.controller.state('normal')
+        heading_label = tk.Label(self,text='wait please \n your command is \n being executed ...',font=('orbitron',45,'bold','italic'),foreground='#ffffff',background='#3d3d5c')
+        heading_label.pack(pady=5)
+        space_label = tk.Label(self,height=4,bg='#3d3d5c')
+        space_label.pack()
+        
+        #enter_button = tk.Button(self,text='Enter',command=check_Rfid,relief='raised',borderwidth = 3,width=40,height=3)
+        #enter_button.pack(pady=10)
+
+        bottom_frame = tk.Frame(self,relief='raised',borderwidth=3)
+        bottom_frame.pack(fill='x',side='bottom')
+
+        visa_photo = tk.PhotoImage(file='visa.png')
+        visa_label = tk.Label(bottom_frame,image=visa_photo)
+        visa_label.pack(side='left')
+        visa_label.image = visa_photo
+
+        mastercard_photo = tk.PhotoImage(file='mastercard.png')
+        mastercard_label = tk.Label(bottom_frame,image=mastercard_photo)
+        mastercard_label.pack(side='left')
+        mastercard_label.image = mastercard_photo
+
+        american_express_photo = tk.PhotoImage(file='american-express.png')
+        american_express_label = tk.Label(bottom_frame,image=american_express_photo)
+        american_express_label.pack(side='left')
+        american_express_label.image = american_express_photo
+
+        def tick():
+            current_time = time.strftime('%I:%M %p').lstrip('0').replace(' 0',' ')
+            time_label.config(text=current_time)
+            time_label.after(200,tick)   
+        time_label = tk.Label(bottom_frame,font=('orbitron',12))
+        time_label.pack(side='right')
+        tick()
 if __name__ == "__main__":
     app = SampleApp()
     #root = tk.Tk()               #Bind Tkinter to the root object
