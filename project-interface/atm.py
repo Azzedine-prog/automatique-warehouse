@@ -4,6 +4,7 @@ import imageio
 from PIL import Image, ImageTk
 import threading as thr
 import time as ti
+from mqttpart import *
 from tkinter import messagebox
 environment_raspberry = 1
 if(environment_raspberry == 1):
@@ -611,6 +612,7 @@ class ConfirmationPage(tk.Frame):
             #...........................................
             #...........................................
             controller.show_frame('wait_page')
+            senddata(products_selected)
         enter_button = tk.Button(self,
                                                      text='afficher ma facture',
                                                      command=show_facture,
