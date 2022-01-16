@@ -5,10 +5,10 @@ from PIL import Image, ImageTk
 import threading as thr
 import time as ti
 from tkinter import messagebox
-environment_raspberry = 0
+environment_raspberry = 1
 if(environment_raspberry == 1):
     from rfid_mod import *
-rfid_hardware_exist = 0
+rfid_hardware_exist = 1
 if(rfid_hardware_exist==1):
     from rfid_mod import *
     azzedine = user(702455483582,"azzedine lakhdar",350)
