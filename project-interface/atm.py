@@ -9,7 +9,7 @@ from tkinter import messagebox
 environment_raspberry = 1
 if(environment_raspberry == 1):
     from rfid_mod import *
-rfid_hardware_exist = 1
+rfid_hardware_exist = 0
 if(rfid_hardware_exist==1):
     from rfid_mod import *
     azzedine = user(702455483582,"azzedine lakhdar",350)
@@ -821,9 +821,10 @@ class wait_page(tk.Frame):
         heading_label.pack(pady=5)
         space_label = tk.Label(self,height=4,bg='#3d3d5c')
         space_label.pack()
-        
-        #enter_button = tk.Button(self,text='Enter',command=check_Rfid,relief='raised',borderwidth = 3,width=40,height=3)
-        #enter_button.pack(pady=10)
+        def menu():
+        	controller.show_frame('MenuPage')
+        return_button = tk.Button(self,text='Enter',command=menu,relief='raised',borderwidth = 3,width=40,height=3)
+        return_button.pack(pady=10)
 
         bottom_frame = tk.Frame(self,relief='raised',borderwidth=3)
         bottom_frame.pack(fill='x',side='bottom')
