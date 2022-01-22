@@ -14,7 +14,7 @@ int revleft4 = 33;       //REVerse motion of Left motor
 int fwdleft5 = 32;       //ForWarD motion of Left motor
 int revright6 = 25;      //REVerse motion of Right motor
 int fwdright7 = 26;      //ForWarD motion of Right motor
-int step_;
+
 long duration, distance;
 void moveforward();
 void movebackward();
@@ -29,7 +29,7 @@ EspMQTTClient client(
   "TestClient",     // Client name that uniquely identify your device
   1883              // The MQTT port, default to 1883. this line can be omitted
 );
-String received_from_raspberry,done_text,number_text;
+String received_from_raspberry,done_text;
 int number = 0;
 char Start,transmission_complete,start_collecting;
 int i =0,done=0;
@@ -63,10 +63,7 @@ void onConnectionEstablished()
     done_text = payload;
     done = done_text.toInt();
   });
-  client.subscribe("from/raspberry", [](const String & payload) {
-    number_text = payload;
-    number = number_text.toInt();
-  });
+
   // Subscribe to "mytopic/wildcardtest/#" and display received message to Serial
   /*client.subscribe("mytopic/wildcardtest/#", [](const String & topic, const String & payload) {
     Serial.println("(From wildcard) topic: " + topic + ", payload: " + payload);
@@ -76,7 +73,7 @@ void onConnectionEstablished()
   //client.publish("mytopic/test", "This is a message"); // You can activate the retain flag by setting the third parameter to true
   //for(int i = 0;i<45;i++){
   client.publish("esp/ismail", "lwafix");
-  //client.subscribe("from/raspberry", onTestMessageReceived);
+  client.subscribe("from/raspberry", onTestMessageReceived);
   //  delay(100);
   //}
   // Execute delayed instructions
@@ -85,16 +82,64 @@ void onConnectionEstablished()
   });*/
 }
 void onTestMessageReceived(const String& message) {
-
+  Serial.println("message received: " + message);
+  received_from_raspberry = message;
+  if(received_from_raspberry == "954031"){
+    Start = 1;
+    }
+  else if(Start == 1 && received_from_raspberry != "" && received_from_raspberry != "785693"){
+    number = received_from_raspberry.toInt();
+    liste_of_items[i] = number;
+    i = i+1; 
+    //Serial.println(received_from_raspberry);
+    Serial.println(liste_of_items[i]);
+    //Serial.println(number);
+    received_from_raspberry = "";
+    }
+    else if(received_from_raspberry == "785693"){
+      Start = 0;
+      transmission_complete = 1;
+      received_from_raspberry = "";
+      } 
 }
 
 void loop()
 {
   client.loop();
-  movebackward();
-  delay(2000);
-  stop_();
-  delay(2000);
+  //client.publish("esp/ismail", "sesnum");
+              Serial.print("distance");
+          Serial.println(distance_());
+        if(transmission_complete == 1){
+        Serial.println("[");
+        for(int j = 0; j<i;j++){
+          number = liste_of_items[j];
+          Serial.print(number);
+          Serial.print(",");
+          delay(2000);
+          }
+          Serial.println("]");
+         transmission_complete = 0;
+         start_collecting = 1;
+         i=0;
+        }
+        if(start_collecting == 1){
+        for(int j = 0; j<i;j++){
+          number = liste_of_items[j];
+          Serial.print("bying product : ");
+          Serial.println(number);
+          client.publish("esp/debug", "bying product");
+          go((number%3)*20);
+          client.publish("from/product", String(number));
+          
+          while(done ==0);
+          done=0;
+          }
+          start_collecting =0;
+        }
+    /*client.subscribe("esp/ismail", [](const String & topic, const String & payload) {
+    Serial.println("(From wildcard) topic: " + topic + ", payload: " + payload);
+  });*/
+  delay(100);
 }
 
 void moveforward(){
@@ -139,17 +184,21 @@ long distance_(){
 //    return distance_();
   return distance;
   }
-void goforward(int x){
+void go(int x){
   while((distance_()-x )< 1){
     moveforward();
     Serial.print(x);
+    Serial.print(" distance");
+    Serial.println(distance_());
     }
   stop_();
-  }
-void gobackward(int x){
-    while((distance_()-x)> 1){
+  while((distance_()-x)> 1){
     movebackward();
     Serial.print(x);
+    Serial.print("distance");
+    Serial.println(distance_());
+    client.publish("esp/debug", "distance ");
+    client.publish("esp/debug", String(distance_()));
     }
   stop_();
   }
